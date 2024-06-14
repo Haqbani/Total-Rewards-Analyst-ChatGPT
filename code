@@ -1,0 +1,26 @@
+import anthropic
+
+client = anthropic.Anthropic(
+    # defaults to os.environ.get("ANTHROPIC_API_KEY")
+    api_key="my_api_key",
+)
+
+# Replace placeholders like {{EXCEL_SHEET}} with real values,
+# because the SDK does not support variables.
+message = client.messages.create(
+    model="claude-3-opus-20240229",
+    max_tokens=1000,
+    temperature=0,
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "You will be analyzing an Excel sheet containing employees' compensation data. The Excel sheet will be provided in the following format:\n\n<excel_sheet>\n{{EXCEL_SHEET}}\n</excel_sheet>\n\nBefore proceeding with the analysis, please ask the following questions to clarify the performance scale and grading system used by the organization:\n\n<performance_scale_question>\nWhat is the performance scale used by the organization? Please provide the scale and the corresponding descriptions for each level (e.g., 1 - does not meet expectations, 2 - partly meets expectations, etc.).\n</performance_scale_question>\n\n<performance_scale>\n{{PERFORMANCE_SCALE}}\n</performance_scale>\n\n<grading_system_question>\nIf the organization uses a letter-based grading system, please provide the sequence of grades from smallest to largest.\n</grading_system_question>\n\n<grading_system>\n{{GRADING_SYSTEM}}\n</grading_system>\n\nNow, please ask about the organization's compensation philosophy:\n\n<compensation_philosophy_question>\nWhat is the organization's total rewards strategy and/or philosophy? Specifically:\n1. Are you targeting to pay above the market? If so, for all levels or just certain grades? Please specify the grades if applicable.\n2. Are you focusing on pay for performance?\n</compensation_philosophy_question>\n\n<compensation_philosophy>\n{{COMPENSATION_PHILOSOPHY}}\n</compensation_philosophy>\n\nWith the provided information, please perform the following analysis:\n\n1. Calculate the total number of employees in a table.\n2. Create a table showing the number of employees in each grade.\n3. Create a table showing the number of employees in each department, function, or division.\n4. Calculate the range spread of each grade and create a table displaying the results In the same table.\n5. Calculate the midpoint to midpoint progression for each grade from lowest grade to the highest in a table.\n6. Calculate the overall comp-ratio median for the salaries.\n7. Group by and  Calculate the count of employees by: (all in one table with emojis )\n   - If salary above the maximum range of the employee grade, count and label them as \"green circles.\"\n   - If salary below the minimum range of employee grade, label them as \"red circles.\"\n   - If the salary is 20% below the maximum range of employee grade label them as \"blue circles.\"\n   - If the salary in in the range of the grade otherwise, label them as \"at risk.\"\n9. Calculate the overall median performance.\n   -Plot the performance distribution in histogram\n   -Check if the performance is normally distributed or not.\n10. Calculate the median performance for each of the following:\n    - average performance for each function/department\n    - average performance for each grade\n\nAfter completing the analysis, please provide your findings in a clear and organized manner inside <analysis_results> tags.\n\nBased on the organization's compensation philosophy and the results of your analysis, please provide recommendations for the organization inside <recommendations> tags. Consider factors such as:\n- If the organization aims to pay above the market and the analysis shows that some employees are placed below or at the lower end of the range despite being high performers, recommend promoting them or providing a lump sum.\n- If the organization focuses on pay for performance, ensure that the recommendations align with this philosophy.\n\nYou can search online in websites like WorldatWork or SHRM to enhance your recommendation capabilities.\n\nPlease remember to use the provided inputs and follow the instructions carefully to generate a comprehensive and insightful analysis with actionable recommendations."
+                }
+            ]
+        }
+    ]
+)
+print(message.content)
